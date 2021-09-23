@@ -1,0 +1,33 @@
+[case1]
+# A simple example with no complex dependencies
+manifest = "case1/test_manifest.toml"
+project = "case1/test_project.toml"
+
+  [case1.seg1]
+  # The handling of creating an empty project and manifest
+  deps = []
+  segment_manifest = "case1/seg1_manifest.toml"
+  segment_project = "case1/seg1_project.toml"
+
+  [case1.seg2]
+  # Creating a segment project for an explicit dependency
+  deps = ["foo"]
+  segment_manifest = "case1/seg2_manifest.toml"
+  segment_project = "case1/seg2_project.toml"
+
+  [case1.seg3]
+  # Creating a segment project for an implicit dependency
+  deps = ["foo1"]
+  segment_manifest = "case1/seg3_manifest.toml"
+  segment_project = "case1/seg3_project.toml"
+
+  [case1.seg4]
+  # Creating a segment project for all dependencies
+  deps = ["foo", "bar"]
+  segment_manifest = "case1/seg4_manifest.toml"
+  segment_project = "case1/seg4_project.toml"
+
+  [case1.seg5]
+  deps = ["bar2:d11ff260-4f54-4ec2-9ff9-58a299161108"]
+  segment_manifest = "case1/seg5_manifest.toml"
+  segment_project = "case1/seg5_project.toml"

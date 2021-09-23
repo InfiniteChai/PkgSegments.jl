@@ -1,0 +1,11 @@
+name = "TestCase1"
+uuid = "de24b42f-6fd0-40c8-be53-ad844a322339"
+authors = ["Foo Bar <foo.bar@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+foo = "8cdd6a97-d057-4071-95f6-34d483f09739"
+bar = "e1740d54-f78e-4b3f-afac-d44cec6a73ee"
+
+[compat]
+julia = "1.0"

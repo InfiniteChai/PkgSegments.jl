@@ -1,0 +1,5 @@
+name = "TestCase1"
+uuid = "de24b42f-6fd0-40c8-be53-ad844a322339"
+
+[deps]
+bar2 = "d11ff260-4f54-4ec2-9ff9-58a299161108"

@@ -1,0 +1,21 @@
+[[foo]]
+uuid = "8cdd6a97-d057-4071-95f6-34d483f09739"
+deps = ["foo1"]
+
+[[foo1]]
+uuid = "7f174527-ddff-4e52-953b-61d5dabb12a6"
+
+[[bar]]
+uuid = "e1740d54-f78e-4b3f-afac-d44cec6a73ee"
+  [bar.deps]
+  bar1 = "db1def62-c222-40fc-b74c-f8765ca28918"
+  bar2 = "d11ff260-4f54-4ec2-9ff9-58a299161108"
+
+[[bar1]]
+uuid = "db1def62-c222-40fc-b74c-f8765ca28918"
+
+[[bar2]]
+uuid = "d11ff260-4f54-4ec2-9ff9-58a299161108"
+
+[[bar2]]
+uuid = "57958445-3f66-4e26-a692-f87410d7e1c6"

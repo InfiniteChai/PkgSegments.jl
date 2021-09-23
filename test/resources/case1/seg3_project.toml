@@ -1,0 +1,5 @@
+name = "TestCase1"
+uuid = "de24b42f-6fd0-40c8-be53-ad844a322339"
+
+[deps]
+foo1 = "7f174527-ddff-4e52-953b-61d5dabb12a6"

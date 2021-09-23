@@ -1,0 +1,6 @@
+[[foo]]
+uuid = "8cdd6a97-d057-4071-95f6-34d483f09739"
+deps = ["foo1"]
+
+[[foo1]]
+uuid = "7f174527-ddff-4e52-953b-61d5dabb12a6"

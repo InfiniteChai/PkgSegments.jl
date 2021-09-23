@@ -28,7 +28,7 @@ struct PackageKey
     PackageKey(name::AbstractString, uuid::Nothing) = new(name, nothing)
     PackageKey(name::AbstractString, uuid::AbstractString) = new(name, UUIDs.UUID(uuid))
     PackageKey(name::AbstractString, uuid::UUIDs.UUID) = new(name, uuid)
-    PackageKey(params::Pair{String, Any}) = PackageKey(params.first, params.second)
+    PackageKey(params::Pair{String, <:Any}) = PackageKey(params.first, params.second)
 end
 
 """
@@ -62,11 +62,11 @@ based on the desired dependencies.
 function generatesegment!(directory::AbstractString, deps::Set{PackageKey}; subdir::AbstractString="seg")
     mkpath(joinpath(directory, subdir))
     open(joinpath(directory, subdir, "Project.toml"), "w") do io
-        TOML.print(io, projectsegment(directory, deps))
+        TOML.print(io, projectsegment(directory, deps); sorted=true)
     end
 
     open(joinpath(directory, subdir, "Manifest.toml"), "w") do io
-        TOML.print(io, manifestsegment(directory, deps))
+        TOML.print(io, manifestsegment(directory, deps); sorted=true)
     end
 end
 
@@ -84,6 +84,68 @@ function genfromsegfile!(directory::AbstractString)
         generatesegment!(directory, deps; subdir=segment["subdir"])
     end
 end
+
+manifesttokey(data::Dict{String,<:Any}) = Dict([PackageKey(n,v["uuid"]) => v for (n,vs) in data for v in vs])
+keytomanifest(data::Dict{PackageKey,<:Any}) = reduce(data; init=Dict{String,Any}()) do val, (key, d)
+    entries = get!(val, key.name, [])
+    push!(entries, d)
+    val
+end
+
+manifestkey(entry::Pair, manifest) = PackageKey(entry)
+manifestkey(entry, manifest) = PackageKey(entry, manifest[PackageKey(entry)]["uuid"])
+
+function segmentdata(project::Dict{String,<:Any}, manifest::Dict{String,<:Any}, deps::Set{PackageKey})
+    keymanifest = manifesttokey(manifest)
+    newdeps = Set{PackageKey}()
+
+    depqueue = Vector{PackageKey}()
+    for dep in deps
+        if dep ∈ keys(keymanifest)
+            push!(newdeps, PackageKey(dep.name, keymanifest[dep]["uuid"]))
+            push!(depqueue, dep)
+        end
+    end
+
+    while length(depqueue) > 0
+        key = pop!(depqueue)
+        entry = keymanifest[key]
+
+        entrydeps = [manifestkey(d, keymanifest) for d in get(entry, "deps", [])]
+
+        append!(depqueue, entrydeps)
+        newdeps = ∪(newdeps, entrydeps)
+    end
+
+    for key in keys(keymanifest)
+        if key ∉ newdeps
+            delete!(keymanifest, key)
+        end
+    end
+
+    segmentmanifest = keytomanifest(keymanifest)
+    # Now let's get the segment project. We only maintain a specific set of fields
+    segmentproject = Dict{String,Any}()
+    for field in ["name", "uuid", "deps"]
+        segmentproject[field] = project[field]
+    end
+    currentdeps = Set([PackageKey(key) for key in segmentproject["deps"]])
+    for dep in newdeps
+        if dep ∉ currentdeps
+            segmentproject["deps"][dep.name] = string(dep.uuid)
+        end
+    end
+
+    for entry in segmentproject["deps"]
+        key = PackageKey(entry)
+        if key ∉ newdeps
+            delete!(segmentproject["deps"], entry[1])
+        end
+    end
+
+    (segmentmanifest, segmentproject)
+end
+
 
 function projectsegment(directory::AbstractString, deps::Set{PackageKey})
     alldeps = copy(deps)
